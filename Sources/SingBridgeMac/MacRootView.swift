@@ -1,5 +1,6 @@
 import SingBridgeCore
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct MacRootView: View {
   @ObservedObject var session: MacReceiverSession
@@ -18,11 +19,24 @@ struct MacRootView: View {
         VStack(alignment: .leading, spacing: 24) {
           header
           transportPanel
+          diagnosticsPanel
           voicePanel
           accompanimentPanel
         }
         .padding(28)
         .frame(maxWidth: .infinity, alignment: .leading)
+      }
+    }
+    .fileImporter(
+      isPresented: Binding(
+        get: { session.isImportingAccompaniment },
+        set: { session.isImportingAccompaniment = $0 }
+      ),
+      allowedContentTypes: [.audio],
+      allowsMultipleSelection: false
+    ) { result in
+      if case .success(let urls) = result, let url = urls.first {
+        session.loadAccompaniment(url: url)
       }
     }
   }
@@ -72,6 +86,24 @@ struct MacRootView: View {
     }
   }
 
+  private var diagnosticsPanel: some View {
+    let diagnostics = session.diagnostics
+    return VStack(alignment: .leading, spacing: 8) {
+      Text("Diagnostics")
+        .font(.headline)
+      Text(diagnostics.message)
+        .font(.subheadline.weight(.semibold))
+      if let latency = diagnostics.latencyMilliseconds {
+        Text("Latency: \(latency) ms")
+          .font(.callout)
+          .foregroundStyle(.secondary)
+      }
+      Text(diagnostics.recommendation)
+        .font(.callout)
+        .foregroundStyle(.secondary)
+    }
+  }
+
   private var voicePanel: some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Voice Mix")
@@ -103,16 +135,48 @@ struct MacRootView: View {
         .font(.headline)
       HStack {
         Button {
+          session.isImportingAccompaniment = true
         } label: {
           Label("Choose Local Track", systemImage: "folder")
         }
         .buttonStyle(.bordered)
 
         Button {
+          session.toggleAccompanimentPlayback()
+        } label: {
+          Label(session.accompanimentState.isPlaying ? "Pause" : "Play", systemImage: session.accompanimentState.isPlaying ? "pause.fill" : "play.fill")
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(session.accompanimentState.fileName == nil)
+
+        Button {
+          session.stopAccompaniment()
+        } label: {
+          Label("Stop", systemImage: "stop.fill")
+        }
+        .buttonStyle(.bordered)
+        .disabled(session.accompanimentState.fileName == nil)
+
+        Button {
         } label: {
           Label("Apple Music", systemImage: "music.note.list")
         }
         .buttonStyle(.bordered)
+      }
+      if let fileName = session.accompanimentState.fileName {
+        Text(fileName)
+          .font(.callout)
+          .foregroundStyle(.secondary)
+        Slider(value: Binding(
+          get: { session.accompanimentState.volume },
+          set: { session.setAccompanimentVolume($0) }
+        ), in: 0...1) {
+          Text("Accompaniment Volume")
+        } minimumValueLabel: {
+          Text("0")
+        } maximumValueLabel: {
+          Text("1")
+        }
       }
       Text("Apple Music support will use MusicKit-authorized catalog and playback features only.")
         .font(.callout)

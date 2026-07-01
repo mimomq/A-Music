@@ -26,3 +26,13 @@
 - Added shared audio jitter buffer and tests.
 - Wired Mac playback through the jitter buffer and surfaced buffer depth in the receiver UI.
 - Confirmed SwiftPM build and 10 core tests pass.
+
+## 0.4.0
+
+- Added shared connection diagnostics model with health, latency, drop, buffer, and recommendation output.
+- Added Mac diagnostics panel.
+- Added local accompaniment player service using `AVAudioPlayer`.
+- Added Mac file importer for user-owned local audio files.
+- Added accompaniment play, pause, stop, and volume controls.
+- Added connection diagnostics tests.
+- Confirmed SwiftPM build and 13 core tests pass.

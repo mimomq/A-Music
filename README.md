@@ -39,6 +39,13 @@ Version `0.3.0` improves the local-network product loop:
 - Mac playback uses a small packet jitter buffer before scheduling audio.
 - Core tests cover jitter buffering, stream decoding, packet framing, audio settings, packet loss, and level metering.
 
+Version `0.4.0` adds usability features for a more complete karaoke loop:
+
+- Mac receiver shows connection diagnostics with latency, packet drops, buffer depth, and suggested fixes.
+- Mac receiver can choose and play a local accompaniment audio file.
+- Local accompaniment supports play, pause, stop, and volume controls.
+- Core tests cover connection diagnostics in addition to transport and audio primitives.
+
 ## Development
 
 Open the package in Xcode:
@@ -63,3 +70,4 @@ The explicit build path avoids macOS Desktop/File Provider metadata on test bund
 3. Select the discovered Mac receiver, or enter the Mac IP address manually if discovery is blocked.
 4. Press `Start` on the phone app.
 5. Confirm the Mac packet counter and buffer count update, and voice level meters move.
+6. Choose a local audio track on the Mac and confirm accompaniment controls work.

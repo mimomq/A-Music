@@ -26,6 +26,14 @@
 - Mac buffer count rises before playback starts and then stays near the target depth.
 - Re-starting listen or capture clears packet, drop, meter, and buffer state.
 
+## v0.4 Diagnostics and Accompaniment Checks
+
+- Diagnostics show idle, waiting, healthy, watch, and poor states from current connection data.
+- High latency or many dropped packets produce a warning recommendation.
+- Mac can choose a local audio file with the system file importer.
+- Local accompaniment can play, pause, stop, and change volume.
+- Apple Music remains clearly marked as a compliant future integration, not raw audio extraction.
+
 ## v0.3 Karaoke Checks
 
 - Local accompaniment can be selected and played.

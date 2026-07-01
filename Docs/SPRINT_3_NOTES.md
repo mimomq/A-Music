@@ -17,7 +17,7 @@
 
 ## Next Sprint
 
-- Add latency calibration and round-trip ping measurement.
+- Add connection diagnostics and actionable recommendations.
 - Add user-facing diagnostics for local-network permission and firewall failures.
 - Add a local accompaniment file picker on Mac.
 - Start separating development Swift Package targets from signed app bundle projects.

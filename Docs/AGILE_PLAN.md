@@ -43,7 +43,7 @@ Prove the core loop: launch both apps, connect phone to Mac on the same network,
 ### Sprint 4: Karaoke Experience
 
 - Add reverb, compression, noise gate, and input gain.
-- Add local accompaniment file picker.
+- Add local accompaniment file picker. Done in `v0.4.0`.
 - Add lyrics/timing import for local tracks.
 - Add recording for user-owned/local audio only.
 

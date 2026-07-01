@@ -14,12 +14,15 @@ final class MacReceiverSession: ObservableObject {
   @Published var droppedPacketCount = 0
   @Published var bufferedPacketCount = 0
   @Published var listenPort = String(SingBridgeNetworkDefaults.port)
+  @Published var accompanimentState = AccompanimentState.empty
+  @Published var isImportingAccompaniment = false
   @Published var errorMessage: String?
 
   private var packetLossCounter = PacketLossCounter()
   private var jitterBuffer = AudioJitterBuffer(targetDepth: 3, maximumDepth: 12)
   private let audioReceiver = NetworkAudioReceiver()
   private let audioPlayback = AudioPlaybackService()
+  private let accompanimentPlayer = AccompanimentPlayerService()
 
   init() {
     audioReceiver.onStateChange = { [weak self] state in
@@ -42,6 +45,20 @@ final class MacReceiverSession: ObservableObject {
         self?.fail(message)
       }
     }
+    accompanimentPlayer.onStateChange = { [weak self] state in
+      self?.accompanimentState = state
+    }
+    accompanimentPlayer.onError = { [weak self] message in
+      self?.fail(message)
+    }
+  }
+
+  var diagnostics: ConnectionDiagnostics {
+    ConnectionDiagnostics(
+      state: connectionState,
+      droppedPacketCount: droppedPacketCount,
+      bufferedPacketCount: bufferedPacketCount
+    )
   }
 
   func startListening() {
@@ -102,5 +119,25 @@ final class MacReceiverSession: ObservableObject {
   private func fail(_ message: String) {
     errorMessage = message
     connectionState = .failed(message: message)
+  }
+
+  func loadAccompaniment(url: URL) {
+    accompanimentPlayer.load(url: url)
+  }
+
+  func toggleAccompanimentPlayback() {
+    if accompanimentState.isPlaying {
+      accompanimentPlayer.pause()
+    } else {
+      accompanimentPlayer.play()
+    }
+  }
+
+  func stopAccompaniment() {
+    accompanimentPlayer.stop()
+  }
+
+  func setAccompanimentVolume(_ volume: Double) {
+    accompanimentPlayer.setVolume(volume)
   }
 }
