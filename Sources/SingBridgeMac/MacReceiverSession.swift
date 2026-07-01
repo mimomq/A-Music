@@ -16,6 +16,10 @@ final class MacReceiverSession: ObservableObject {
   @Published var listenPort = String(SingBridgeNetworkDefaults.port)
   @Published var accompanimentState = AccompanimentState.empty
   @Published var isImportingAccompaniment = false
+  @Published var appleMusicQuery = ""
+  @Published var appleMusicAuthorization = AppleMusicAuthorizationSummary(statusDescription: "Not requested", canSearchCatalog: false)
+  @Published var appleMusicResults: [AppleMusicCatalogTrack] = []
+  @Published var isSearchingAppleMusic = false
   @Published var errorMessage: String?
 
   private var packetLossCounter = PacketLossCounter()
@@ -23,6 +27,7 @@ final class MacReceiverSession: ObservableObject {
   private let audioReceiver = NetworkAudioReceiver()
   private let audioPlayback = AudioPlaybackService()
   private let accompanimentPlayer = AccompanimentPlayerService()
+  private let appleMusicCatalog = AppleMusicCatalogService()
 
   init() {
     audioReceiver.onStateChange = { [weak self] state in
@@ -51,6 +56,7 @@ final class MacReceiverSession: ObservableObject {
     accompanimentPlayer.onError = { [weak self] message in
       self?.fail(message)
     }
+    appleMusicAuthorization = appleMusicCatalog.currentAuthorization()
   }
 
   var diagnostics: ConnectionDiagnostics {
@@ -139,5 +145,30 @@ final class MacReceiverSession: ObservableObject {
 
   func setAccompanimentVolume(_ volume: Double) {
     accompanimentPlayer.setVolume(volume)
+  }
+
+  func seekAccompaniment(to progress: Double) {
+    accompanimentPlayer.seek(to: progress)
+  }
+
+  func requestAppleMusicAuthorization() {
+    Task { @MainActor [weak self] in
+      guard let self else { return }
+      appleMusicAuthorization = await appleMusicCatalog.requestAuthorization()
+    }
+  }
+
+  func searchAppleMusic() {
+    Task { @MainActor [weak self] in
+      guard let self else { return }
+      isSearchingAppleMusic = true
+      defer { isSearchingAppleMusic = false }
+
+      do {
+        appleMusicResults = try await appleMusicCatalog.search(term: appleMusicQuery)
+      } catch {
+        fail(error.localizedDescription)
+      }
+    }
   }
 }

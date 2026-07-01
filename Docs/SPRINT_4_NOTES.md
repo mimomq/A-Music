@@ -16,7 +16,7 @@
 
 ## Next Sprint
 
-- Add accompaniment progress, seeking, and track metadata.
-- Add MusicKit authorization and catalog search.
+- Add accompaniment progress, seeking, and track metadata. Done in `v0.5.0`.
+- Add MusicKit authorization and catalog search. Done in `v0.5.0`.
 - Add round-trip latency ping messages between phone and Mac.
 - Create signed app bundle project files for real device QA.

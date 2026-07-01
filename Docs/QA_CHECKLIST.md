@@ -34,6 +34,14 @@
 - Local accompaniment can play, pause, stop, and change volume.
 - Apple Music remains clearly marked as a compliant future integration, not raw audio extraction.
 
+## v0.5 Library and Progress Checks
+
+- Local accompaniment shows elapsed and duration text.
+- Dragging the accompaniment progress slider seeks within the local track.
+- MusicKit authorization status appears in the Apple Music panel.
+- Apple Music catalog search returns title, artist, and album metadata for authorized users.
+- Apple Music results do not offer recording, exporting, raw waveform access, or vocal removal.
+
 ## v0.3 Karaoke Checks
 
 - Local accompaniment can be selected and played.

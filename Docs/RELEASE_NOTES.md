@@ -36,3 +36,13 @@
 - Added accompaniment play, pause, stop, and volume controls.
 - Added connection diagnostics tests.
 - Confirmed SwiftPM build and 13 core tests pass.
+
+## 0.5.0
+
+- Added local accompaniment elapsed time, duration, progress, and seeking.
+- Added shared track time formatter and tests.
+- Added Apple Music catalog track model.
+- Added MusicKit authorization service on Mac.
+- Added Apple Music catalog search panel on Mac.
+- Preserved Apple Music compliance boundary: catalog metadata only, no protected audio extraction or transformation.
+- Confirmed SwiftPM build and 15 core tests pass.

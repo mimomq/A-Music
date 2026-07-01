@@ -22,6 +22,7 @@ struct MacRootView: View {
           diagnosticsPanel
           voicePanel
           accompanimentPanel
+          appleMusicPanel
         }
         .padding(28)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -168,6 +169,16 @@ struct MacRootView: View {
           .font(.callout)
           .foregroundStyle(.secondary)
         Slider(value: Binding(
+          get: { session.accompanimentState.progress },
+          set: { session.seekAccompaniment(to: $0) }
+        ), in: 0...1) {
+          Text("Track Progress")
+        } minimumValueLabel: {
+          Text(session.accompanimentState.elapsedText)
+        } maximumValueLabel: {
+          Text(session.accompanimentState.durationText)
+        }
+        Slider(value: Binding(
           get: { session.accompanimentState.volume },
           set: { session.setAccompanimentVolume($0) }
         ), in: 0...1) {
@@ -179,6 +190,54 @@ struct MacRootView: View {
         }
       }
       Text("Apple Music support will use MusicKit-authorized catalog and playback features only.")
+        .font(.callout)
+        .foregroundStyle(.secondary)
+    }
+  }
+
+  private var appleMusicPanel: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Apple Music")
+        .font(.headline)
+
+      HStack {
+        Text("Status: \(session.appleMusicAuthorization.statusDescription)")
+          .font(.callout)
+          .foregroundStyle(.secondary)
+        Button {
+          session.requestAppleMusicAuthorization()
+        } label: {
+          Label("Authorize", systemImage: "person.badge.key")
+        }
+        .buttonStyle(.bordered)
+      }
+
+      HStack {
+        TextField("Search Apple Music", text: $session.appleMusicQuery)
+        Button {
+          session.searchAppleMusic()
+        } label: {
+          Label(session.isSearchingAppleMusic ? "Searching" : "Search", systemImage: "magnifyingglass")
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(session.appleMusicQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+
+      if !session.appleMusicResults.isEmpty {
+        VStack(alignment: .leading, spacing: 8) {
+          ForEach(session.appleMusicResults) { track in
+            VStack(alignment: .leading, spacing: 2) {
+              Text(track.title)
+                .font(.subheadline.weight(.semibold))
+              Text([track.artistName, track.albumTitle].compactMap { $0 }.joined(separator: " - "))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          }
+        }
+      }
+
+      Text("Search uses MusicKit catalog metadata. Protected Apple Music audio is not extracted, transformed, recorded, or exported.")
         .font(.callout)
         .foregroundStyle(.secondary)
     }

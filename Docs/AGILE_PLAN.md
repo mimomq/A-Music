@@ -44,13 +44,15 @@ Prove the core loop: launch both apps, connect phone to Mac on the same network,
 
 - Add reverb, compression, noise gate, and input gain.
 - Add local accompaniment file picker. Done in `v0.4.0`.
+- Add accompaniment progress and seeking. Done in `v0.5.0`.
 - Add lyrics/timing import for local tracks.
 - Add recording for user-owned/local audio only.
 
 ### Sprint 5: Apple Music Surface
 
-- Add MusicKit authorization.
-- Add Apple Music catalog search and user library browsing.
+- Add MusicKit authorization. Done in `v0.5.0`.
+- Add Apple Music catalog search. Done in `v0.5.0`.
+- Add user library browsing.
 - Add compliant playback handoff where allowed.
 - Document feature limitations around DRM, raw audio access, vocal removal, and recording.
 
