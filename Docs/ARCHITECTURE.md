@@ -12,6 +12,8 @@ SingBridge is split into three layers:
 
 The intended production transport is `Network.framework` over a local Wi-Fi network. Bluetooth is treated as a fallback discovery or future transport because it is more likely to introduce unacceptable karaoke monitoring latency.
 
+The current implementation uses a TCP connection to port `49555` with manual host entry. Bonjour service metadata is declared by the listener, but automatic discovery and pairing UI are not complete yet.
+
 The first packet format is deliberately simple:
 
 - 4-byte magic header: `SBRG`
@@ -22,11 +24,13 @@ The first packet format is deliberately simple:
 
 This supports ordering, dropped-frame detection, and latency measurement before the project commits to a final codec.
 
+TCP stream framing adds a 4-byte big-endian packet length prefix before each encoded packet.
+
 ## Audio
 
 The MVP uses uncompressed PCM internally while the product proves latency. Later versions can evaluate Opus or AAC-LC when network bandwidth, quality, or battery pressure requires compression.
 
-Mac playback should use a small jitter buffer. Too little buffering causes glitches; too much buffering makes singing feel disconnected.
+`v0.2.0` captures mono Float32 PCM and schedules it directly into an `AVAudioPlayerNode` on the Mac. Mac playback should use a small jitter buffer next. Too little buffering causes glitches; too much buffering makes singing feel disconnected.
 
 ## Apple Music
 

@@ -34,6 +34,11 @@ struct MacRootView: View {
       Text(session.connectionState.displayText)
         .font(.title3)
         .foregroundStyle(.secondary)
+      if let errorMessage = session.errorMessage {
+        Text(errorMessage)
+          .font(.callout)
+          .foregroundStyle(.red)
+      }
     }
   }
 
@@ -41,6 +46,8 @@ struct MacRootView: View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Connection")
         .font(.headline)
+      TextField("Port", text: $session.listenPort)
+        .frame(width: 120)
       HStack {
         Button {
           session.startListening()

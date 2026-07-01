@@ -23,6 +23,15 @@ The first commercially realistic version focuses on a compliant and useful core:
 
 Version `0.1.0` is a scaffolded Swift Package with the first product slices and testable shared logic. It is designed to be opened in Xcode 15+ and evolved into separate signed iOS/macOS app targets when bundle capabilities, entitlements, and App Store metadata are configured.
 
+Version `0.2.0` adds the first real audio-path implementation:
+
+- Phone side captures microphone samples as mono Float32 PCM.
+- Phone side sends length-prefixed audio packets over TCP.
+- Mac side listens on port `49555`, decodes packets, tracks drops, and schedules PCM playback.
+- The iPhone UI includes a Mac host field for manual local-network connection.
+
+Bonjour discovery, echo cancellation, latency calibration, and signed app bundle targets remain upcoming product slices.
+
 ## Development
 
 Open the package in Xcode:
@@ -34,7 +43,16 @@ open Package.swift
 Run tests when Xcode command line tools are available:
 
 ```sh
-swift test
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+swift test --disable-sandbox --build-path /private/tmp/singbridge-build
 ```
 
-The current machine reports missing command line developer tools, so local compilation could not be verified from the terminal yet.
+The explicit build path avoids macOS Desktop/File Provider metadata on test bundles.
+
+## Manual Smoke Test
+
+1. Start the Mac receiver and press `Listen`.
+2. Find the Mac local IP address on the same Wi-Fi network.
+3. Enter that IP address in the phone app.
+4. Press `Start` on the phone app.
+5. Confirm the Mac packet counter increases and voice level meters move.

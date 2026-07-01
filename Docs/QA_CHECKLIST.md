@@ -11,7 +11,8 @@
 ## v0.2 Audio Path Checks
 
 - iPhone prompts for microphone permission only when capture starts.
-- Mac discovers iPhone on the same Wi-Fi network.
+- Mac listens on port `49555`.
+- Phone can connect to a manually entered Mac host on the same Wi-Fi network.
 - Audio plays through Mac speakers with no crash after five minutes.
 - Median mouth-to-speaker latency is measured and recorded.
 - Dropped packets are counted during poor network conditions.

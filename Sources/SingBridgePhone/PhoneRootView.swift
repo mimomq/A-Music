@@ -25,6 +25,11 @@ struct PhoneRootView: View {
       Text(session.isCapturing ? "Microphone is ready to stream to your Mac." : "Tap start when your Mac receiver is open.")
         .font(.subheadline)
         .foregroundStyle(.secondary)
+      if let errorMessage = session.errorMessage {
+        Text(errorMessage)
+          .font(.callout)
+          .foregroundStyle(.red)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }
@@ -40,20 +45,29 @@ struct PhoneRootView: View {
   }
 
   private var controls: some View {
-    HStack(spacing: 12) {
-      Button {
-        session.isCapturing ? session.stop() : session.start()
-      } label: {
-        Label(session.isCapturing ? "Stop" : "Start", systemImage: session.isCapturing ? "stop.fill" : "mic.fill")
-      }
-      .buttonStyle(.borderedProminent)
+    VStack(alignment: .leading, spacing: 12) {
+      TextField("Mac host", text: $session.macHost)
+        #if os(iOS)
+        .keyboardType(.numbersAndPunctuation)
+        .textInputAutocapitalization(.never)
+        .autocorrectionDisabled()
+        #endif
 
-      Button {
-        session.toggleMute()
-      } label: {
-        Label(session.settings.isMuted ? "Unmute" : "Mute", systemImage: session.settings.isMuted ? "mic.slash.fill" : "mic.fill")
+      HStack(spacing: 12) {
+        Button {
+          session.isCapturing ? session.stop() : session.start()
+        } label: {
+          Label(session.isCapturing ? "Stop" : "Start", systemImage: session.isCapturing ? "stop.fill" : "mic.fill")
+        }
+        .buttonStyle(.borderedProminent)
+
+        Button {
+          session.toggleMute()
+        } label: {
+          Label(session.settings.isMuted ? "Unmute" : "Mute", systemImage: session.settings.isMuted ? "mic.slash.fill" : "mic.fill")
+        }
+        .buttonStyle(.bordered)
       }
-      .buttonStyle(.bordered)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

@@ -26,10 +26,10 @@ Prove the core loop: launch both apps, connect phone to Mac on the same network,
 
 ### Sprint 2: Real Audio Path
 
-- Implement iPhone `AVAudioEngine` capture.
-- Encode PCM frames into stream packets.
-- Implement local-network transport with `Network.framework`.
-- Add Mac receiver jitter buffer and `AVAudioEngine` playback.
+- Implement iPhone `AVAudioEngine` capture. Done in `v0.2.0`.
+- Encode PCM frames into stream packets. Done in `v0.2.0`.
+- Implement local-network transport with `Network.framework`. Done in `v0.2.0` with manual host entry.
+- Add Mac receiver jitter buffer and `AVAudioEngine` playback. Playback is done in `v0.2.0`; adaptive jitter buffering remains open.
 - Measure end-to-end latency on Wi-Fi.
 
 ### Sprint 3: Karaoke Experience
