@@ -12,7 +12,7 @@ SingBridge is split into three layers:
 
 The intended production transport is `Network.framework` over a local Wi-Fi network. Bluetooth is treated as a fallback discovery or future transport because it is more likely to introduce unacceptable karaoke monitoring latency.
 
-The current implementation uses a TCP connection to port `49555` with manual host entry. Bonjour service metadata is declared by the listener, but automatic discovery and pairing UI are not complete yet.
+The current implementation uses a TCP connection to port `49555`. The Mac listener advertises `_singbridge._tcp` through Bonjour, and the phone app browses for nearby receivers. Manual host entry remains as a fallback when local-network discovery is blocked.
 
 The first packet format is deliberately simple:
 
@@ -30,7 +30,7 @@ TCP stream framing adds a 4-byte big-endian packet length prefix before each enc
 
 The MVP uses uncompressed PCM internally while the product proves latency. Later versions can evaluate Opus or AAC-LC when network bandwidth, quality, or battery pressure requires compression.
 
-`v0.2.0` captures mono Float32 PCM and schedules it directly into an `AVAudioPlayerNode` on the Mac. Mac playback should use a small jitter buffer next. Too little buffering causes glitches; too much buffering makes singing feel disconnected.
+`v0.2.0` captures mono Float32 PCM and schedules it into an `AVAudioPlayerNode` on the Mac. `v0.3.0` adds a small packet jitter buffer that holds a target depth before playback. Too little buffering causes glitches; too much buffering makes singing feel disconnected.
 
 ## Apple Music
 

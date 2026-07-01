@@ -9,15 +9,15 @@
 
 ## Known Product Gaps
 
-- Pairing still requires manually entering the Mac IP address.
+- Pairing no longer requires manually entering the Mac IP address when Bonjour discovery is available.
 - Latency shown on the Mac uses sender packet timestamps and is only a rough development signal until clock synchronization or round-trip measurement is added.
-- Playback has no adaptive jitter buffer yet.
+- Playback has a basic packet jitter buffer, but no adaptive tuning yet.
 - Echo cancellation and feedback suppression are not implemented.
 - The Swift Package is still a development scaffold, not signed App Store app bundles.
 
 ## Next Sprint
 
-- Add Bonjour discovery and one-tap pairing.
-- Add a small jitter buffer before Mac playback.
+- Harden Bonjour discovery across firewall and local-network permission failure cases.
+- Add adaptive jitter buffer tuning.
 - Add manual latency calibration and a simple latency test tone.
 - Add user-facing setup guidance for same-network permission failures.

@@ -38,6 +38,35 @@ final class NetworkAudioSender {
     connection.start(queue: queue)
   }
 
+  func connect(to receiver: DiscoveredMacReceiver) {
+    connect(host: receiver.host, port: receiver.port)
+  }
+
+  func connect(endpoint: NWEndpoint, displayName: String) {
+    stop()
+
+    let connection = NWConnection(to: endpoint, using: .tcp)
+    self.connection = connection
+    onStateChange?(.connecting(deviceName: displayName))
+
+    connection.stateUpdateHandler = { [weak self] state in
+      guard let self else { return }
+      switch state {
+      case .ready:
+        self.onStateChange?(.connected(deviceName: displayName, latencyMilliseconds: 0))
+      case .failed(let error):
+        self.onError?(error.localizedDescription)
+        self.onStateChange?(.failed(message: error.localizedDescription))
+      case .cancelled:
+        self.onStateChange?(.idle)
+      default:
+        break
+      }
+    }
+
+    connection.start(queue: queue)
+  }
+
   func send(packet: AudioPacket) {
     guard let connection else { return }
     let frame = StreamPacketEncoder.frame(packet)

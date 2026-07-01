@@ -17,3 +17,12 @@
 - Wired the phone and Mac session models to real capture, send, receive, and playback services.
 - Added manual Mac host entry on the phone and listen-port entry on the Mac.
 - Added tests for stream decoding and Float32 level metering.
+
+## 0.3.0
+
+- Added Bonjour receiver discovery on the phone.
+- Added discovered Mac receiver selection UI while keeping manual host entry as a fallback.
+- Added shared discovered receiver model.
+- Added shared audio jitter buffer and tests.
+- Wired Mac playback through the jitter buffer and surfaced buffer depth in the receiver UI.
+- Confirmed SwiftPM build and 10 core tests pass.

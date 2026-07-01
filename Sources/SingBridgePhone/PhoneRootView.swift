@@ -8,6 +8,7 @@ struct PhoneRootView: View {
     NavigationStack {
       VStack(spacing: 24) {
         connectionPanel
+        discoveryPanel
         levelPanel
         controls
         settingsPanel
@@ -41,6 +42,50 @@ struct PhoneRootView: View {
       ProgressView(value: session.levelMeter.average)
       ProgressView(value: session.levelMeter.peak)
         .tint(.orange)
+    }
+  }
+
+  private var discoveryPanel: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      HStack {
+        Text("Nearby Macs")
+          .font(.headline)
+        Spacer()
+        Button {
+          session.isDiscovering ? session.stopDiscovery() : session.startDiscovery()
+        } label: {
+          Label(session.isDiscovering ? "Stop Scan" : "Scan", systemImage: session.isDiscovering ? "pause.fill" : "magnifyingglass")
+        }
+        .buttonStyle(.bordered)
+      }
+
+      if session.discoveredReceivers.isEmpty {
+        Text("No receiver found yet. You can still enter a Mac host manually.")
+          .font(.callout)
+          .foregroundStyle(.secondary)
+      } else {
+        ForEach(session.discoveredReceivers) { receiver in
+          Button {
+            session.select(receiver: receiver)
+          } label: {
+            HStack {
+              VStack(alignment: .leading, spacing: 2) {
+                Text(receiver.name)
+                  .font(.subheadline.weight(.semibold))
+                Text(receiver.endpointText)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
+              Spacer()
+              if receiver.id == session.selectedReceiverID {
+                Image(systemName: "checkmark.circle.fill")
+                  .foregroundStyle(.green)
+              }
+            }
+          }
+          .buttonStyle(.bordered)
+        }
+      }
     }
   }
 

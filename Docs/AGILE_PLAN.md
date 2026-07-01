@@ -28,18 +28,26 @@ Prove the core loop: launch both apps, connect phone to Mac on the same network,
 
 - Implement iPhone `AVAudioEngine` capture. Done in `v0.2.0`.
 - Encode PCM frames into stream packets. Done in `v0.2.0`.
-- Implement local-network transport with `Network.framework`. Done in `v0.2.0` with manual host entry.
-- Add Mac receiver jitter buffer and `AVAudioEngine` playback. Playback is done in `v0.2.0`; adaptive jitter buffering remains open.
+- Implement local-network transport with `Network.framework`. Done in `v0.2.0` with manual host entry and improved in `v0.3.0` with Bonjour discovery.
+- Add Mac receiver jitter buffer and `AVAudioEngine` playback. Playback is done in `v0.2.0`; basic packet jitter buffering is done in `v0.3.0`; adaptive jitter buffering remains open.
 - Measure end-to-end latency on Wi-Fi.
 
-### Sprint 3: Karaoke Experience
+### Sprint 3: Pairing and Stability
+
+- Add Bonjour discovery and one-tap receiver selection. Done in `v0.3.0`.
+- Add visible buffer depth and packet drop indicators. Done in `v0.3.0`.
+- Add adaptive jitter buffer tuning.
+- Add microphone permission recovery flow.
+- Add setup diagnostics for local-network permission and firewall issues.
+
+### Sprint 4: Karaoke Experience
 
 - Add reverb, compression, noise gate, and input gain.
 - Add local accompaniment file picker.
 - Add lyrics/timing import for local tracks.
 - Add recording for user-owned/local audio only.
 
-### Sprint 4: Apple Music Surface
+### Sprint 5: Apple Music Surface
 
 - Add MusicKit authorization.
 - Add Apple Music catalog search and user library browsing.

@@ -18,6 +18,14 @@
 - Dropped packets are counted during poor network conditions.
 - Stopping either app closes the session cleanly.
 
+## v0.3 Pairing and Buffer Checks
+
+- Mac receiver appears in phone scan results on the same Wi-Fi network.
+- Selecting a discovered Mac updates the selected receiver state.
+- Phone can still connect with manual host entry if discovery is unavailable.
+- Mac buffer count rises before playback starts and then stays near the target depth.
+- Re-starting listen or capture clears packet, drop, meter, and buffer state.
+
 ## v0.3 Karaoke Checks
 
 - Local accompaniment can be selected and played.

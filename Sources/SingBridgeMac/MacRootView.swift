@@ -66,6 +66,9 @@ struct MacRootView: View {
       Text("Packets: \(session.receivedPacketCount) received, \(session.droppedPacketCount) dropped")
         .font(.callout)
         .foregroundStyle(.secondary)
+      Text("Buffer: \(session.bufferedPacketCount) packets")
+        .font(.callout)
+        .foregroundStyle(.secondary)
     }
   }
 

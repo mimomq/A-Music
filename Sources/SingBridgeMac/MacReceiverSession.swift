@@ -12,10 +12,12 @@ final class MacReceiverSession: ObservableObject {
   @Published var levelMeter = LevelMeter.silent
   @Published var receivedPacketCount = 0
   @Published var droppedPacketCount = 0
+  @Published var bufferedPacketCount = 0
   @Published var listenPort = String(SingBridgeNetworkDefaults.port)
   @Published var errorMessage: String?
 
   private var packetLossCounter = PacketLossCounter()
+  private var jitterBuffer = AudioJitterBuffer(targetDepth: 3, maximumDepth: 12)
   private let audioReceiver = NetworkAudioReceiver()
   private let audioPlayback = AudioPlaybackService()
 
@@ -61,7 +63,9 @@ final class MacReceiverSession: ObservableObject {
     levelMeter = .silent
     receivedPacketCount = 0
     droppedPacketCount = 0
+    bufferedPacketCount = 0
     packetLossCounter.reset()
+    jitterBuffer.reset()
   }
 
   func receive(encodedPacket data: Data) {
@@ -80,7 +84,13 @@ final class MacReceiverSession: ObservableObject {
     receivedPacketCount = packetLossCounter.receivedCount
     droppedPacketCount = packetLossCounter.droppedCount
     levelMeter = level
-    audioPlayback.play(payload: packet.payload, gain: settings.inputGain)
+    jitterBuffer.enqueue(packet)
+    bufferedPacketCount = jitterBuffer.count
+
+    for readyPacket in jitterBuffer.drainReady() {
+      audioPlayback.play(payload: readyPacket.payload, gain: settings.inputGain)
+    }
+    bufferedPacketCount = jitterBuffer.count
 
     if case .connected(let deviceName, _) = connectionState {
       let now = DispatchTime.now().uptimeNanoseconds

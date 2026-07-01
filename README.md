@@ -32,6 +32,13 @@ Version `0.2.0` adds the first real audio-path implementation:
 
 Bonjour discovery, echo cancellation, latency calibration, and signed app bundle targets remain upcoming product slices.
 
+Version `0.3.0` improves the local-network product loop:
+
+- Mac receiver advertises a Bonjour `_singbridge._tcp` service.
+- Phone app can scan nearby receivers and select one instead of requiring manual host entry.
+- Mac playback uses a small packet jitter buffer before scheduling audio.
+- Core tests cover jitter buffering, stream decoding, packet framing, audio settings, packet loss, and level metering.
+
 ## Development
 
 Open the package in Xcode:
@@ -52,7 +59,7 @@ The explicit build path avoids macOS Desktop/File Provider metadata on test bund
 ## Manual Smoke Test
 
 1. Start the Mac receiver and press `Listen`.
-2. Find the Mac local IP address on the same Wi-Fi network.
-3. Enter that IP address in the phone app.
+2. Press `Scan` on the phone app.
+3. Select the discovered Mac receiver, or enter the Mac IP address manually if discovery is blocked.
 4. Press `Start` on the phone app.
-5. Confirm the Mac packet counter increases and voice level meters move.
+5. Confirm the Mac packet counter and buffer count update, and voice level meters move.
