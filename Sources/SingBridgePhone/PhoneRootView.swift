@@ -3,6 +3,15 @@ import SwiftUI
 
 struct PhoneRootView: View {
   @ObservedObject var session: PhoneMicrophoneSession
+  @AppStorage(AppLanguage.storageKey) private var selectedLanguageValue = AppLanguage.english.rawValue
+
+  private var language: AppLanguage {
+    AppLanguage.fromStorageValue(selectedLanguageValue)
+  }
+
+  private var strings: AppStrings {
+    AppStrings(language: language)
+  }
 
   var body: some View {
     NavigationStack {
@@ -15,15 +24,15 @@ struct PhoneRootView: View {
         Spacer(minLength: 0)
       }
       .padding()
-      .navigationTitle("SingBridge Mic")
+      .navigationTitle(strings.singBridgeMic)
     }
   }
 
   private var connectionPanel: some View {
     VStack(alignment: .leading, spacing: 10) {
-      Text(session.connectionState.displayText)
+      Text(strings.connectionState(session.connectionState))
         .font(.headline)
-      Text(session.isCapturing ? "Microphone is ready to stream to your Mac." : "Tap start when your Mac receiver is open.")
+      Text(session.isCapturing ? strings.microphoneReadyHint : strings.startHint)
         .font(.subheadline)
         .foregroundStyle(.secondary)
       if let errorMessage = session.errorMessage {
@@ -37,7 +46,7 @@ struct PhoneRootView: View {
 
   private var levelPanel: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("Voice Level")
+      Text(strings.voiceLevel)
         .font(.subheadline.weight(.semibold))
       ProgressView(value: session.levelMeter.average)
       ProgressView(value: session.levelMeter.peak)
@@ -48,19 +57,19 @@ struct PhoneRootView: View {
   private var discoveryPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
       HStack {
-        Text("Nearby Macs")
+        Text(strings.nearbyMacs)
           .font(.headline)
         Spacer()
         Button {
           session.isDiscovering ? session.stopDiscovery() : session.startDiscovery()
         } label: {
-          Label(session.isDiscovering ? "Stop Scan" : "Scan", systemImage: session.isDiscovering ? "pause.fill" : "magnifyingglass")
+          Label(session.isDiscovering ? strings.stopScan : strings.scan, systemImage: session.isDiscovering ? "pause.fill" : "magnifyingglass")
         }
         .buttonStyle(.bordered)
       }
 
       if session.discoveredReceivers.isEmpty {
-        Text("No receiver found yet. You can still enter a Mac host manually.")
+        Text(strings.noReceiverHint)
           .font(.callout)
           .foregroundStyle(.secondary)
       } else {
@@ -91,7 +100,7 @@ struct PhoneRootView: View {
 
   private var controls: some View {
     VStack(alignment: .leading, spacing: 12) {
-      TextField("Mac host", text: $session.macHost)
+      TextField(strings.macHost, text: $session.macHost)
         #if os(iOS)
         .keyboardType(.numbersAndPunctuation)
         .textInputAutocapitalization(.never)
@@ -102,14 +111,14 @@ struct PhoneRootView: View {
         Button {
           session.isCapturing ? session.stop() : session.start()
         } label: {
-          Label(session.isCapturing ? "Stop" : "Start", systemImage: session.isCapturing ? "stop.fill" : "mic.fill")
+          Label(session.isCapturing ? strings.stop : strings.start, systemImage: session.isCapturing ? "stop.fill" : "mic.fill")
         }
         .buttonStyle(.borderedProminent)
 
         Button {
           session.toggleMute()
         } label: {
-          Label(session.settings.isMuted ? "Unmute" : "Mute", systemImage: session.settings.isMuted ? "mic.slash.fill" : "mic.fill")
+          Label(session.settings.isMuted ? strings.unmute : strings.mute, systemImage: session.settings.isMuted ? "mic.slash.fill" : "mic.fill")
         }
         .buttonStyle(.bordered)
       }
@@ -119,21 +128,31 @@ struct PhoneRootView: View {
 
   private var settingsPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Monitor")
+      Text(strings.languageLabel)
+        .font(.headline)
+      Picker(strings.languageLabel, selection: $selectedLanguageValue) {
+        ForEach(AppLanguage.allCases) { language in
+          Text(language.displayName).tag(language.rawValue)
+        }
+      }
+      .labelsHidden()
+      .pickerStyle(.segmented)
+
+      Text(strings.monitor)
         .font(.headline)
       Slider(value: $session.settings.inputGain, in: 0...2) {
-        Text("Input Gain")
+        Text(strings.inputGain)
       } minimumValueLabel: {
         Text("0")
       } maximumValueLabel: {
         Text("2x")
       }
       Slider(value: $session.settings.monitorMix, in: 0...1) {
-        Text("Mix")
+        Text(strings.mix)
       } minimumValueLabel: {
-        Text("Dry")
+        Text(strings.dry)
       } maximumValueLabel: {
-        Text("Wet")
+        Text(strings.wet)
       }
     }
   }

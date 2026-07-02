@@ -4,20 +4,30 @@ import UniformTypeIdentifiers
 
 struct MacRootView: View {
   @ObservedObject var session: MacReceiverSession
+  @AppStorage(AppLanguage.storageKey) private var selectedLanguageValue = AppLanguage.english.rawValue
+
+  private var language: AppLanguage {
+    AppLanguage.fromStorageValue(selectedLanguageValue)
+  }
+
+  private var strings: AppStrings {
+    AppStrings(language: language)
+  }
 
   var body: some View {
     NavigationSplitView {
       List {
-        Label("Receiver", systemImage: "dot.radiowaves.left.and.right")
-        Label("Voice", systemImage: "waveform")
-        Label("Music", systemImage: "music.note")
-        Label("Settings", systemImage: "gearshape")
+        Label(strings.receiver, systemImage: "dot.radiowaves.left.and.right")
+        Label(strings.voice, systemImage: "waveform")
+        Label(strings.music, systemImage: "music.note")
+        Label(strings.settings, systemImage: "gearshape")
       }
       .navigationTitle("SingBridge")
     } detail: {
       ScrollView {
         VStack(alignment: .leading, spacing: 24) {
           header
+          languagePanel
           transportPanel
           diagnosticsPanel
           voicePanel
@@ -57,9 +67,9 @@ struct MacRootView: View {
 
   private var header: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("Karaoke Receiver")
+      Text(strings.karaokeReceiver)
         .font(.largeTitle.weight(.bold))
-      Text(session.connectionState.displayText)
+      Text(strings.connectionState(session.connectionState))
         .font(.title3)
         .foregroundStyle(.secondary)
       if let errorMessage = session.errorMessage {
@@ -70,38 +80,53 @@ struct MacRootView: View {
     }
   }
 
+  private var languagePanel: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text(strings.languageLabel)
+        .font(.headline)
+      Picker(strings.languageLabel, selection: $selectedLanguageValue) {
+        ForEach(AppLanguage.allCases) { language in
+          Text(language.displayName).tag(language.rawValue)
+        }
+      }
+      .labelsHidden()
+      .pickerStyle(.segmented)
+      .frame(maxWidth: 320)
+    }
+  }
+
   private var transportPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Connection")
+      Text(strings.connection)
         .font(.headline)
-      TextField("Port", text: $session.listenPort)
+      TextField(strings.port, text: $session.listenPort)
         .frame(width: 120)
       HStack {
         Button {
           session.startListening()
         } label: {
-          Label("Listen", systemImage: "antenna.radiowaves.left.and.right")
+          Label(strings.listen, systemImage: "antenna.radiowaves.left.and.right")
         }
         .buttonStyle(.borderedProminent)
 
         Button {
           session.stopListening()
         } label: {
-          Label("Stop", systemImage: "stop.fill")
+          Label(strings.stop, systemImage: "stop.fill")
         }
         .buttonStyle(.bordered)
 
         Button {
           session.toggleSelfTest()
         } label: {
-          Label(session.isRunningSelfTest ? "Stop Test" : "Self Test", systemImage: session.isRunningSelfTest ? "waveform.slash" : "waveform")
+          Label(session.isRunningSelfTest ? strings.stopTest : strings.selfTest, systemImage: session.isRunningSelfTest ? "waveform.slash" : "waveform")
         }
         .buttonStyle(.bordered)
       }
-      Text("Packets: \(session.receivedPacketCount) received, \(session.droppedPacketCount) dropped")
+      Text(strings.packets(received: session.receivedPacketCount, dropped: session.droppedPacketCount))
         .font(.callout)
         .foregroundStyle(.secondary)
-      Text("Buffer: \(session.bufferedPacketCount) packets")
+      Text(strings.buffer(packetCount: session.bufferedPacketCount))
         .font(.callout)
         .foregroundStyle(.secondary)
     }
@@ -109,17 +134,18 @@ struct MacRootView: View {
 
   private var diagnosticsPanel: some View {
     let diagnostics = session.diagnostics
+    let localizedDiagnostics = strings.diagnostics(diagnostics)
     return VStack(alignment: .leading, spacing: 8) {
-      Text("Diagnostics")
+      Text(strings.diagnostics)
         .font(.headline)
-      Text(diagnostics.message)
+      Text(localizedDiagnostics.message)
         .font(.subheadline.weight(.semibold))
       if let latency = diagnostics.latencyMilliseconds {
-        Text("Latency: \(latency) ms")
+        Text(strings.latency(milliseconds: latency))
           .font(.callout)
           .foregroundStyle(.secondary)
       }
-      Text(diagnostics.recommendation)
+      Text(localizedDiagnostics.recommendation)
         .font(.callout)
         .foregroundStyle(.secondary)
     }
@@ -127,10 +153,10 @@ struct MacRootView: View {
 
   private var voicePanel: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Voice Mix")
+      Text(strings.voiceMix)
         .font(.headline)
       Slider(value: $session.settings.inputGain, in: 0...2) {
-        Text("Voice Gain")
+        Text(strings.voiceGain)
       } minimumValueLabel: {
         Text("0")
       } maximumValueLabel: {
@@ -140,7 +166,7 @@ struct MacRootView: View {
         get: { Double(session.settings.targetLatencyMilliseconds) },
         set: { session.settings.targetLatencyMilliseconds = Int($0) }
       ), in: 20...150, step: 1) {
-        Text("Target Latency")
+        Text(strings.targetLatency)
       } minimumValueLabel: {
         Text("20 ms")
       } maximumValueLabel: {
@@ -152,20 +178,20 @@ struct MacRootView: View {
 
   private var accompanimentPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Accompaniment")
+      Text(strings.accompaniment)
         .font(.headline)
       HStack {
         Button {
           session.isImportingAccompaniment = true
         } label: {
-          Label("Choose Local Track", systemImage: "folder")
+          Label(strings.chooseLocalTrack, systemImage: "folder")
         }
         .buttonStyle(.bordered)
 
         Button {
           session.toggleAccompanimentPlayback()
         } label: {
-          Label(session.accompanimentState.isPlaying ? "Pause" : "Play", systemImage: session.accompanimentState.isPlaying ? "pause.fill" : "play.fill")
+          Label(session.accompanimentState.isPlaying ? strings.pause : strings.play, systemImage: session.accompanimentState.isPlaying ? "pause.fill" : "play.fill")
         }
         .buttonStyle(.borderedProminent)
         .disabled(session.accompanimentState.fileName == nil)
@@ -173,14 +199,14 @@ struct MacRootView: View {
         Button {
           session.stopAccompaniment()
         } label: {
-          Label("Stop", systemImage: "stop.fill")
+          Label(strings.stop, systemImage: "stop.fill")
         }
         .buttonStyle(.bordered)
         .disabled(session.accompanimentState.fileName == nil)
 
         Button {
         } label: {
-          Label("Apple Music", systemImage: "music.note.list")
+          Label(strings.appleMusic, systemImage: "music.note.list")
         }
         .buttonStyle(.bordered)
       }
@@ -192,7 +218,7 @@ struct MacRootView: View {
           get: { session.accompanimentState.progress },
           set: { session.seekAccompaniment(to: $0) }
         ), in: 0...1) {
-          Text("Track Progress")
+          Text(strings.trackProgress)
         } minimumValueLabel: {
           Text(session.accompanimentState.elapsedText)
         } maximumValueLabel: {
@@ -202,14 +228,14 @@ struct MacRootView: View {
           get: { session.accompanimentState.volume },
           set: { session.setAccompanimentVolume($0) }
         ), in: 0...1) {
-          Text("Accompaniment Volume")
+          Text(strings.accompanimentVolume)
         } minimumValueLabel: {
           Text("0")
         } maximumValueLabel: {
           Text("1")
         }
       }
-      Text("Apple Music support will use MusicKit-authorized catalog and playback features only.")
+      Text(strings.localAccompanimentNotice)
         .font(.callout)
         .foregroundStyle(.secondary)
     }
@@ -217,13 +243,13 @@ struct MacRootView: View {
 
   private var lyricsPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Lyrics")
+      Text(strings.lyrics)
         .font(.headline)
       HStack {
         Button {
           session.isImportingLyrics = true
         } label: {
-          Label("Import LRC", systemImage: "text.quote")
+          Label(strings.importLRC, systemImage: "text.quote")
         }
         .buttonStyle(.bordered)
 
@@ -238,7 +264,7 @@ struct MacRootView: View {
         Text(activeLine.text)
           .font(.title2.weight(.semibold))
       } else {
-        Text("Import an LRC file to sync lyrics with local accompaniment.")
+        Text(strings.importLyricsHint)
           .font(.callout)
           .foregroundStyle(.secondary)
       }
@@ -253,13 +279,13 @@ struct MacRootView: View {
         get: { session.lyricsOffsetSeconds },
         set: { session.setLyricsOffset($0) }
       ), in: -3...3, step: 0.1) {
-        Text("Lyrics Offset")
+        Text(strings.lyricsOffset)
       } minimumValueLabel: {
         Text("-3s")
       } maximumValueLabel: {
         Text("+3s")
       }
-      Text("Offset: \(session.lyricsOffsetSeconds, specifier: "%.1f")s")
+      Text(strings.offset(seconds: session.lyricsOffsetSeconds))
         .font(.caption)
         .foregroundStyle(.secondary)
     }
@@ -267,27 +293,27 @@ struct MacRootView: View {
 
   private var appleMusicPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("Apple Music")
+      Text(strings.appleMusic)
         .font(.headline)
 
       HStack {
-        Text("Status: \(session.appleMusicAuthorization.statusDescription)")
+        Text(strings.status(session.appleMusicAuthorization.statusDescription))
           .font(.callout)
           .foregroundStyle(.secondary)
         Button {
           session.requestAppleMusicAuthorization()
         } label: {
-          Label("Authorize", systemImage: "person.badge.key")
+          Label(strings.authorize, systemImage: "person.badge.key")
         }
         .buttonStyle(.bordered)
       }
 
       HStack {
-        TextField("Search Apple Music", text: $session.appleMusicQuery)
+        TextField(strings.searchAppleMusic, text: $session.appleMusicQuery)
         Button {
           session.searchAppleMusic()
         } label: {
-          Label(session.isSearchingAppleMusic ? "Searching" : "Search", systemImage: "magnifyingglass")
+          Label(session.isSearchingAppleMusic ? strings.searching : strings.search, systemImage: "magnifyingglass")
         }
         .buttonStyle(.borderedProminent)
         .disabled(session.appleMusicQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -308,7 +334,7 @@ struct MacRootView: View {
               Button {
                 session.playAppleMusic(track: track)
               } label: {
-                Label(session.playingAppleMusicTrackID == track.id ? "Playing" : "Play", systemImage: session.playingAppleMusicTrackID == track.id ? "speaker.wave.2.fill" : "play.fill")
+                Label(session.playingAppleMusicTrackID == track.id ? strings.playing : strings.play, systemImage: session.playingAppleMusicTrackID == track.id ? "speaker.wave.2.fill" : "play.fill")
               }
               .buttonStyle(.bordered)
               .disabled(!session.appleMusicAuthorization.canSearchCatalog)
@@ -317,7 +343,7 @@ struct MacRootView: View {
         }
       }
 
-      Text("Search uses MusicKit catalog metadata. Protected Apple Music audio is not extracted, transformed, recorded, or exported.")
+      Text(strings.appleMusicSafetyNotice)
         .font(.callout)
         .foregroundStyle(.secondary)
     }
