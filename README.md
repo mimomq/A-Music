@@ -26,7 +26,7 @@ Mac and iPhone work are tracked as separate development tasks. Build and validat
 - Mac receiver task: run `SingBridgeMac` on `My Mac`.
 - iPhone microphone task: run `SingBridgePhone` on the physical iPhone.
 
-Open `/Users/li/Desktop/music/SingBridgeMacApp` in Xcode for Mac work, and `/Users/li/Desktop/music/SingBridgePhoneApp` in Xcode for iPhone work. Do not run the Mac target with an iPhone destination selected. See `Docs/DEVELOPMENT_TASKS.md` for the task scopes and acceptance checks.
+Open `/Users/li/Desktop/music/SingBridgeMacApp` in Xcode for Mac work, and `/Users/li/Desktop/music/SingBridgePhoneApp/SingBridgePhoneApp.xcodeproj` in Xcode for iPhone work. For iPhone, select the `SingBridgePhoneApp` scheme and your physical iPhone. Do not run the Mac target with an iPhone destination selected. See `Docs/DEVELOPMENT_TASKS.md` for the task scopes and acceptance checks.
 
 ## MVP Status
 
