@@ -19,6 +19,15 @@ The first commercially realistic version focuses on a compliant and useful core:
 - `Sources/SingBridgeMac`: macOS SwiftUI app shell and receiver/playback service.
 - `Docs`: agile backlog, architecture notes, and release plan.
 
+## Development Task Split
+
+Mac and iPhone work are tracked as separate development tasks. Build and validate one target at a time:
+
+- Mac receiver task: run `SingBridgeMac` on `My Mac`.
+- iPhone microphone task: run `SingBridgePhone` on the physical iPhone.
+
+Do not run the Mac target with an iPhone destination selected. See `Docs/DEVELOPMENT_TASKS.md` for the task scopes and acceptance checks.
+
 ## MVP Status
 
 Version `0.1.0` is a scaffolded Swift Package with the first product slices and testable shared logic. It is designed to be opened in Xcode 15+ and evolved into separate signed iOS/macOS app targets when bundle capabilities, entitlements, and App Store metadata are configured.
@@ -67,6 +76,12 @@ Version `0.7.0` makes local sessions easier to resume:
 - Lyrics offset can be adjusted from -3s to +3s for manual sync correction.
 - Core tests cover session snapshot encoding and lyrics offset lookup.
 
+Version `0.8.0` adds the Mac-first MVP verification loop:
+
+- Mac can inject generated audio packets through the receiver, jitter buffer, playback, diagnostics, and UI path.
+- The self test verifies Mac audio playback without an iPhone or network setup.
+- MVP validation is split into Mac receiver checks, iPhone microphone checks, and a final integration gate.
+
 ## Development
 
 Open the package in Xcode:
@@ -86,14 +101,17 @@ The explicit build path avoids macOS Desktop/File Provider metadata on test bund
 
 ## Manual Smoke Test
 
-1. Start the Mac receiver and press `Listen`.
-2. Press `Scan` on the phone app.
-3. Select the discovered Mac receiver, or enter the Mac IP address manually if discovery is blocked.
-4. Press `Start` on the phone app.
-5. Confirm the Mac packet counter and buffer count update, and voice level meters move.
-6. Choose a local audio track on the Mac and confirm accompaniment controls work.
-7. Search Apple Music from the Mac panel after authorization and confirm catalog results appear.
-8. Import an `.lrc` file and confirm current lyrics advance with the local accompaniment timeline.
-9. Adjust lyrics offset and confirm the active lyric changes earlier or later.
+1. Run `SingBridgeMac` on `My Mac`.
+2. Press `Self Test` and confirm the Mac emits a tone and diagnostics update.
+3. Press `Listen` on the Mac receiver.
+4. Run `SingBridgePhone` on the physical iPhone.
+5. Press `Scan` on the phone app.
+6. Select the discovered Mac receiver, or enter the Mac IP address manually if discovery is blocked.
+7. Press `Start` on the phone app.
+8. Confirm the Mac packet counter and buffer count update, and voice level meters move.
+9. Choose a local audio track on the Mac and confirm accompaniment controls work.
+10. Search Apple Music from the Mac panel after authorization and confirm catalog results appear.
+11. Import an `.lrc` file and confirm current lyrics advance with the local accompaniment timeline.
+12. Adjust lyrics offset and confirm the active lyric changes earlier or later.
 
 For the full verification sequence, see `Docs/MVP_VERIFICATION.md`.

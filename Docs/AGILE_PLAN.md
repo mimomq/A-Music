@@ -14,6 +14,14 @@ Create a playful karaoke companion where the iPhone becomes the microphone, the 
 
 Prove the core loop: launch both apps, connect phone to Mac on the same network, capture mic input, send audio packets, play them on the Mac, and expose basic voice controls.
 
+## Development Tracks
+
+Mac and iPhone work are developed as separate tasks.
+
+- Mac receiver track: receiver startup, listening, audio playback, diagnostics, self test, accompaniment, lyrics, and MusicKit surfaces.
+- iPhone microphone track: device signing, microphone permission, capture, discovery, manual host fallback, mute, gain, and packet sending.
+- Integration gate: phone-to-Mac streaming is validated only after both tracks pass independently.
+
 ## Backlog
 
 ### Sprint 1: Foundations
@@ -60,10 +68,11 @@ Prove the core loop: launch both apps, connect phone to Mac on the same network,
 
 ## Definition of Done
 
-- The feature builds on both iOS and macOS targets.
+- The feature builds on the target for its track.
 - The happy path has manual QA notes or automated tests.
 - User-facing errors exist for permission, network, and audio-device failures.
 - No feature relies on extracting or modifying protected Apple Music audio.
+- Cross-device work has passed the Mac receiver checks before iPhone integration starts.
 
 ## Risks
 
