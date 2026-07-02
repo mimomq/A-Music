@@ -60,6 +60,13 @@ Version `0.6.0` adds singing context:
 - Apple Music catalog results can be handed off to `ApplicationMusicPlayer` for compliant system playback.
 - LRC parsing supports multiple timestamps per line and is covered by tests.
 
+Version `0.7.0` makes local sessions easier to resume:
+
+- Mac saves the last local accompaniment path, lyrics path, accompaniment volume, and lyrics offset.
+- Mac restores available local accompaniment and lyrics on launch.
+- Lyrics offset can be adjusted from -3s to +3s for manual sync correction.
+- Core tests cover session snapshot encoding and lyrics offset lookup.
+
 ## Development
 
 Open the package in Xcode:
@@ -87,3 +94,4 @@ The explicit build path avoids macOS Desktop/File Provider metadata on test bund
 6. Choose a local audio track on the Mac and confirm accompaniment controls work.
 7. Search Apple Music from the Mac panel after authorization and confirm catalog results appear.
 8. Import an `.lrc` file and confirm current lyrics advance with the local accompaniment timeline.
+9. Adjust lyrics offset and confirm the active lyric changes earlier or later.

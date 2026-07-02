@@ -19,6 +19,7 @@ final class MacReceiverSession: ObservableObject {
   @Published var isImportingLyrics = false
   @Published var lyricsFileName: String?
   @Published var lyricsLines: [LyricsLine] = []
+  @Published var lyricsOffsetSeconds: Double = 0
   @Published var appleMusicQuery = ""
   @Published var appleMusicAuthorization = AppleMusicAuthorizationSummary(statusDescription: "Not requested", canSearchCatalog: false)
   @Published var appleMusicResults: [AppleMusicCatalogTrack] = []
@@ -32,6 +33,7 @@ final class MacReceiverSession: ObservableObject {
   private let audioPlayback = AudioPlaybackService()
   private let accompanimentPlayer = AccompanimentPlayerService()
   private let appleMusicCatalog = AppleMusicCatalogService()
+  private let sessionStore = KaraokeSessionStore()
 
   init() {
     audioReceiver.onStateChange = { [weak self] state in
@@ -61,6 +63,7 @@ final class MacReceiverSession: ObservableObject {
       self?.fail(message)
     }
     appleMusicAuthorization = appleMusicCatalog.currentAuthorization()
+    restoreSavedSession()
   }
 
   var diagnostics: ConnectionDiagnostics {
@@ -72,11 +75,19 @@ final class MacReceiverSession: ObservableObject {
   }
 
   var activeLyricsLine: LyricsLine? {
-    LRCLyricsParser.activeLine(in: lyricsLines, at: accompanimentState.currentTime)
+    LyricsTimeline.activeLine(
+      in: lyricsLines,
+      playbackTime: accompanimentState.currentTime,
+      offset: lyricsOffsetSeconds
+    )
   }
 
   var nextLyricsLine: LyricsLine? {
-    lyricsLines.first { $0.time > accompanimentState.currentTime }
+    LyricsTimeline.nextLine(
+      in: lyricsLines,
+      playbackTime: accompanimentState.currentTime,
+      offset: lyricsOffsetSeconds
+    )
   }
 
   func startListening() {
@@ -141,6 +152,7 @@ final class MacReceiverSession: ObservableObject {
 
   func loadAccompaniment(url: URL) {
     accompanimentPlayer.load(url: url)
+    saveSession(accompanimentURL: url)
   }
 
   func toggleAccompanimentPlayback() {
@@ -157,6 +169,7 @@ final class MacReceiverSession: ObservableObject {
 
   func setAccompanimentVolume(_ volume: Double) {
     accompanimentPlayer.setVolume(volume)
+    saveSession()
   }
 
   func seekAccompaniment(to progress: Double) {
@@ -168,9 +181,15 @@ final class MacReceiverSession: ObservableObject {
       let content = try String(contentsOf: url, encoding: .utf8)
       lyricsLines = LRCLyricsParser.parse(content)
       lyricsFileName = url.lastPathComponent
+      saveSession(lyricsURL: url)
     } catch {
       fail(error.localizedDescription)
     }
+  }
+
+  func setLyricsOffset(_ offset: Double) {
+    lyricsOffsetSeconds = offset
+    saveSession()
   }
 
   func requestAppleMusicAuthorization() {
@@ -204,5 +223,39 @@ final class MacReceiverSession: ObservableObject {
         fail(error.localizedDescription)
       }
     }
+  }
+
+  private func restoreSavedSession() {
+    let snapshot = sessionStore.load()
+    lyricsOffsetSeconds = snapshot.lyricsOffsetSeconds
+
+    if let accompanimentPath = snapshot.accompanimentPath {
+      let url = URL(fileURLWithPath: accompanimentPath)
+      if FileManager.default.fileExists(atPath: url.path) {
+        accompanimentPlayer.load(url: url)
+      }
+    }
+
+    if let lyricsPath = snapshot.lyricsPath {
+      let url = URL(fileURLWithPath: lyricsPath)
+      if FileManager.default.fileExists(atPath: url.path) {
+        loadLyrics(url: url)
+      }
+    }
+
+    if snapshot.accompanimentVolume != accompanimentState.volume {
+      accompanimentPlayer.setVolume(snapshot.accompanimentVolume)
+    }
+  }
+
+  private func saveSession(accompanimentURL: URL? = nil, lyricsURL: URL? = nil) {
+    let existing = sessionStore.load()
+    let snapshot = KaraokeSessionSnapshot(
+      accompanimentPath: accompanimentURL?.path ?? existing.accompanimentPath,
+      lyricsPath: lyricsURL?.path ?? existing.lyricsPath,
+      lyricsOffsetSeconds: lyricsOffsetSeconds,
+      accompanimentVolume: accompanimentState.volume
+    )
+    sessionStore.save(snapshot)
   }
 }

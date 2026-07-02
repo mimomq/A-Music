@@ -50,6 +50,14 @@
 - Apple Music result play button hands playback to `ApplicationMusicPlayer`.
 - Apple Music playback still does not expose raw audio, recording, vocal removal, or waveform editing.
 
+## v0.7 Persistence and Sync Checks
+
+- Mac saves the selected local accompaniment path.
+- Mac saves the selected LRC lyrics path.
+- Mac saves accompaniment volume and lyrics offset.
+- Relaunching the Mac app restores files that still exist on disk.
+- Lyrics offset slider changes active and next lyric selection.
+
 ## v0.3 Karaoke Checks
 
 - Local accompaniment can be selected and played.

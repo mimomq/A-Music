@@ -17,6 +17,6 @@
 ## Next Sprint
 
 - Add MusicKit user library browsing.
-- Persist local accompaniment and lyrics metadata.
-- Add local lyric offset adjustment.
+- Persist local accompaniment and lyrics metadata. Done in `v0.7.0`.
+- Add local lyric offset adjustment. Done in `v0.7.0`.
 - Add round-trip latency messages between phone and Mac.

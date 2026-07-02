@@ -241,6 +241,20 @@ struct MacRootView: View {
           .font(.callout)
           .foregroundStyle(.secondary)
       }
+
+      Slider(value: Binding(
+        get: { session.lyricsOffsetSeconds },
+        set: { session.setLyricsOffset($0) }
+      ), in: -3...3, step: 0.1) {
+        Text("Lyrics Offset")
+      } minimumValueLabel: {
+        Text("-3s")
+      } maximumValueLabel: {
+        Text("+3s")
+      }
+      Text("Offset: \(session.lyricsOffsetSeconds, specifier: "%.1f")s")
+        .font(.caption)
+        .foregroundStyle(.secondary)
     }
   }
 

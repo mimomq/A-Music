@@ -46,6 +46,8 @@ Prove the core loop: launch both apps, connect phone to Mac on the same network,
 - Add local accompaniment file picker. Done in `v0.4.0`.
 - Add accompaniment progress and seeking. Done in `v0.5.0`.
 - Add lyrics/timing import for local tracks. Done in `v0.6.0`.
+- Persist local accompaniment and lyrics session metadata. Done in `v0.7.0`.
+- Add manual lyrics sync offset. Done in `v0.7.0`.
 - Add recording for user-owned/local audio only.
 
 ### Sprint 5: Apple Music Surface

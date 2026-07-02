@@ -55,3 +55,12 @@
 - Added Apple Music playback handoff for catalog search results through `ApplicationMusicPlayer`.
 - Kept Apple Music compliance boundary: playback handoff only, no protected audio extraction or transformation.
 - Confirmed SwiftPM build and 18 core tests pass.
+
+## 0.7.0
+
+- Added shared karaoke session snapshot model.
+- Added shared lyrics timeline helper for offset-aware active and next-line lookup.
+- Added Mac session persistence for local accompaniment path, lyrics path, volume, and lyrics offset.
+- Added lyrics offset slider for manual sync correction.
+- Added tests for session snapshot coding and lyrics offset lookup.
+- Confirmed SwiftPM build and 21 core tests pass.
