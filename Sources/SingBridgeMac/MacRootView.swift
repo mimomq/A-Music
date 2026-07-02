@@ -22,6 +22,7 @@ struct MacRootView: View {
           diagnosticsPanel
           voicePanel
           accompanimentPanel
+          lyricsPanel
           appleMusicPanel
         }
         .padding(28)
@@ -38,6 +39,18 @@ struct MacRootView: View {
     ) { result in
       if case .success(let urls) = result, let url = urls.first {
         session.loadAccompaniment(url: url)
+      }
+    }
+    .fileImporter(
+      isPresented: Binding(
+        get: { session.isImportingLyrics },
+        set: { session.isImportingLyrics = $0 }
+      ),
+      allowedContentTypes: [.plainText],
+      allowsMultipleSelection: false
+    ) { result in
+      if case .success(let urls) = result, let url = urls.first {
+        session.loadLyrics(url: url)
       }
     }
   }
@@ -195,6 +208,42 @@ struct MacRootView: View {
     }
   }
 
+  private var lyricsPanel: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Lyrics")
+        .font(.headline)
+      HStack {
+        Button {
+          session.isImportingLyrics = true
+        } label: {
+          Label("Import LRC", systemImage: "text.quote")
+        }
+        .buttonStyle(.bordered)
+
+        if let lyricsFileName = session.lyricsFileName {
+          Text(lyricsFileName)
+            .font(.callout)
+            .foregroundStyle(.secondary)
+        }
+      }
+
+      if let activeLine = session.activeLyricsLine {
+        Text(activeLine.text)
+          .font(.title2.weight(.semibold))
+      } else {
+        Text("Import an LRC file to sync lyrics with local accompaniment.")
+          .font(.callout)
+          .foregroundStyle(.secondary)
+      }
+
+      if let nextLine = session.nextLyricsLine {
+        Text(nextLine.text)
+          .font(.callout)
+          .foregroundStyle(.secondary)
+      }
+    }
+  }
+
   private var appleMusicPanel: some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("Apple Music")
@@ -226,12 +275,22 @@ struct MacRootView: View {
       if !session.appleMusicResults.isEmpty {
         VStack(alignment: .leading, spacing: 8) {
           ForEach(session.appleMusicResults) { track in
-            VStack(alignment: .leading, spacing: 2) {
-              Text(track.title)
-                .font(.subheadline.weight(.semibold))
-              Text([track.artistName, track.albumTitle].compactMap { $0 }.joined(separator: " - "))
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HStack {
+              VStack(alignment: .leading, spacing: 2) {
+                Text(track.title)
+                  .font(.subheadline.weight(.semibold))
+                Text([track.artistName, track.albumTitle].compactMap { $0 }.joined(separator: " - "))
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
+              Spacer()
+              Button {
+                session.playAppleMusic(track: track)
+              } label: {
+                Label(session.playingAppleMusicTrackID == track.id ? "Playing" : "Play", systemImage: session.playingAppleMusicTrackID == track.id ? "speaker.wave.2.fill" : "play.fill")
+              }
+              .buttonStyle(.bordered)
+              .disabled(!session.appleMusicAuthorization.canSearchCatalog)
             }
           }
         }

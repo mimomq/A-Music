@@ -16,9 +16,13 @@ final class MacReceiverSession: ObservableObject {
   @Published var listenPort = String(SingBridgeNetworkDefaults.port)
   @Published var accompanimentState = AccompanimentState.empty
   @Published var isImportingAccompaniment = false
+  @Published var isImportingLyrics = false
+  @Published var lyricsFileName: String?
+  @Published var lyricsLines: [LyricsLine] = []
   @Published var appleMusicQuery = ""
   @Published var appleMusicAuthorization = AppleMusicAuthorizationSummary(statusDescription: "Not requested", canSearchCatalog: false)
   @Published var appleMusicResults: [AppleMusicCatalogTrack] = []
+  @Published var playingAppleMusicTrackID: AppleMusicCatalogTrack.ID?
   @Published var isSearchingAppleMusic = false
   @Published var errorMessage: String?
 
@@ -65,6 +69,14 @@ final class MacReceiverSession: ObservableObject {
       droppedPacketCount: droppedPacketCount,
       bufferedPacketCount: bufferedPacketCount
     )
+  }
+
+  var activeLyricsLine: LyricsLine? {
+    LRCLyricsParser.activeLine(in: lyricsLines, at: accompanimentState.currentTime)
+  }
+
+  var nextLyricsLine: LyricsLine? {
+    lyricsLines.first { $0.time > accompanimentState.currentTime }
   }
 
   func startListening() {
@@ -151,6 +163,16 @@ final class MacReceiverSession: ObservableObject {
     accompanimentPlayer.seek(to: progress)
   }
 
+  func loadLyrics(url: URL) {
+    do {
+      let content = try String(contentsOf: url, encoding: .utf8)
+      lyricsLines = LRCLyricsParser.parse(content)
+      lyricsFileName = url.lastPathComponent
+    } catch {
+      fail(error.localizedDescription)
+    }
+  }
+
   func requestAppleMusicAuthorization() {
     Task { @MainActor [weak self] in
       guard let self else { return }
@@ -166,6 +188,18 @@ final class MacReceiverSession: ObservableObject {
 
       do {
         appleMusicResults = try await appleMusicCatalog.search(term: appleMusicQuery)
+      } catch {
+        fail(error.localizedDescription)
+      }
+    }
+  }
+
+  func playAppleMusic(track: AppleMusicCatalogTrack) {
+    Task { @MainActor [weak self] in
+      guard let self else { return }
+      do {
+        try await appleMusicCatalog.play(trackID: track.id)
+        playingAppleMusicTrackID = track.id
       } catch {
         fail(error.localizedDescription)
       }

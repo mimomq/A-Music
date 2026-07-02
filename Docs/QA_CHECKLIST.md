@@ -42,6 +42,14 @@
 - Apple Music catalog search returns title, artist, and album metadata for authorized users.
 - Apple Music results do not offer recording, exporting, raw waveform access, or vocal removal.
 
+## v0.6 Lyrics and Playback Handoff Checks
+
+- LRC import accepts plain text `.lrc` files.
+- Current lyric follows local accompaniment `currentTime`.
+- Next lyric preview advances as the track progresses.
+- Apple Music result play button hands playback to `ApplicationMusicPlayer`.
+- Apple Music playback still does not expose raw audio, recording, vocal removal, or waveform editing.
+
 ## v0.3 Karaoke Checks
 
 - Local accompaniment can be selected and played.

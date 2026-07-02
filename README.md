@@ -53,6 +53,13 @@ Version `0.5.0` starts the music-library experience:
 - Apple Music results show track, artist, and album metadata.
 - Apple Music remains metadata/search only; protected audio is not extracted, transformed, recorded, or exported.
 
+Version `0.6.0` adds singing context:
+
+- Local `.lrc` lyric files can be imported on Mac.
+- Lyrics sync to local accompaniment time with current and next-line display.
+- Apple Music catalog results can be handed off to `ApplicationMusicPlayer` for compliant system playback.
+- LRC parsing supports multiple timestamps per line and is covered by tests.
+
 ## Development
 
 Open the package in Xcode:
@@ -79,3 +86,4 @@ The explicit build path avoids macOS Desktop/File Provider metadata on test bund
 5. Confirm the Mac packet counter and buffer count update, and voice level meters move.
 6. Choose a local audio track on the Mac and confirm accompaniment controls work.
 7. Search Apple Music from the Mac panel after authorization and confirm catalog results appear.
+8. Import an `.lrc` file and confirm current lyrics advance with the local accompaniment timeline.

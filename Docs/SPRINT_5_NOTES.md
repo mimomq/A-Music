@@ -16,7 +16,7 @@
 
 ## Next Sprint
 
-- Add MusicKit playback handoff where allowed.
+- Add MusicKit playback handoff where allowed. Done in `v0.6.0`.
 - Add user library browsing.
 - Add local accompaniment metadata persistence.
-- Add lyrics import for user-owned local tracks.
+- Add lyrics import for user-owned local tracks. Done in `v0.6.0`.

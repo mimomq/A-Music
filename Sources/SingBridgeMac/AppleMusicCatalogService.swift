@@ -7,6 +7,10 @@ import MusicKit
 
 @MainActor
 final class AppleMusicCatalogService {
+  #if canImport(MusicKit)
+  private var songsByID: [String: Song] = [:]
+  #endif
+
   func requestAuthorization() async -> AppleMusicAuthorizationSummary {
     #if canImport(MusicKit)
     let status = await MusicAuthorization.request()
@@ -33,6 +37,7 @@ final class AppleMusicCatalogService {
     var request = MusicCatalogSearchRequest(term: trimmedTerm, types: [Song.self])
     request.limit = 12
     let response = try await request.response()
+    songsByID = Dictionary(uniqueKeysWithValues: response.songs.map { ($0.id.rawValue, $0) })
     return response.songs.map { song in
       AppleMusicCatalogTrack(
         id: song.id.rawValue,
@@ -45,6 +50,29 @@ final class AppleMusicCatalogService {
     #else
     return []
     #endif
+  }
+
+  func play(trackID: String) async throws {
+    #if canImport(MusicKit)
+    guard let song = songsByID[trackID] else {
+      throw AppleMusicCatalogError.trackNotLoaded
+    }
+
+    let player = ApplicationMusicPlayer.shared
+    player.queue = [song]
+    try await player.play()
+    #endif
+  }
+}
+
+enum AppleMusicCatalogError: LocalizedError {
+  case trackNotLoaded
+
+  var errorDescription: String? {
+    switch self {
+    case .trackNotLoaded:
+      "Search for this Apple Music track again before playing it."
+    }
   }
 }
 

@@ -46,3 +46,12 @@
 - Added Apple Music catalog search panel on Mac.
 - Preserved Apple Music compliance boundary: catalog metadata only, no protected audio extraction or transformation.
 - Confirmed SwiftPM build and 15 core tests pass.
+
+## 0.6.0
+
+- Added shared LRC lyrics parser.
+- Added tests for timed lyrics, multiple timestamps per line, and active lyric lookup.
+- Added Mac LRC import with synced current and next lyric display.
+- Added Apple Music playback handoff for catalog search results through `ApplicationMusicPlayer`.
+- Kept Apple Music compliance boundary: playback handoff only, no protected audio extraction or transformation.
+- Confirmed SwiftPM build and 18 core tests pass.
