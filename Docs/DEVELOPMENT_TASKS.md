@@ -92,3 +92,12 @@ Build one target at a time:
 - For iPhone work: scheme/product `SingBridgePhone`, destination the physical iPhone.
 
 Do not use an iPhone destination while running `SingBridgeMac`, and do not use `My Mac` while validating iPhone capture.
+
+## Local Xcode Folders
+
+Open these folders directly in Xcode:
+
+- Mac receiver: `/Users/li/Desktop/music/SingBridgeMacApp`
+- iPhone microphone: `/Users/li/Desktop/music/SingBridgePhoneApp`
+
+Each folder is its own Swift Package and contains only the matching executable target. The source folders inside these packages are linked back to the main repository, so edits made from either Xcode window still update the shared codebase.
