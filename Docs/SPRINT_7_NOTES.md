@@ -18,5 +18,6 @@
 
 - Add MusicKit user library browsing.
 - Add round-trip ping messages between phone and Mac.
+- Add Mac-only audio-chain self-test before real-device QA. Done in `v0.8.0`.
 - Add signed app bundle project files for real-device QA.
 - Upgrade file persistence to security-scoped bookmarks when app sandboxing is enabled.

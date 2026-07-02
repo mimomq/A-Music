@@ -95,3 +95,5 @@ The explicit build path avoids macOS Desktop/File Provider metadata on test bund
 7. Search Apple Music from the Mac panel after authorization and confirm catalog results appear.
 8. Import an `.lrc` file and confirm current lyrics advance with the local accompaniment timeline.
 9. Adjust lyrics offset and confirm the active lyric changes earlier or later.
+
+For the full verification sequence, see `Docs/MVP_VERIFICATION.md`.

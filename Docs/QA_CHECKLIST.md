@@ -58,6 +58,14 @@
 - Relaunching the Mac app restores files that still exist on disk.
 - Lyrics offset slider changes active and next lyric selection.
 
+## v0.8 MVP Verification Checks
+
+- Mac `Self Test` emits a short audible tone.
+- Self test increments packet count and updates buffer count.
+- Self test moves the voice level meter.
+- Self test updates diagnostics without requiring iPhone or network setup.
+- `Docs/MVP_VERIFICATION.md` covers automated tests, Mac self-test, iPhone microphone streaming, accompaniment, lyrics, and Apple Music checks.
+
 ## v0.3 Karaoke Checks
 
 - Local accompaniment can be selected and played.

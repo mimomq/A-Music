@@ -90,6 +90,13 @@ struct MacRootView: View {
           Label("Stop", systemImage: "stop.fill")
         }
         .buttonStyle(.bordered)
+
+        Button {
+          session.toggleSelfTest()
+        } label: {
+          Label(session.isRunningSelfTest ? "Stop Test" : "Self Test", systemImage: session.isRunningSelfTest ? "waveform.slash" : "waveform")
+        }
+        .buttonStyle(.bordered)
       }
       Text("Packets: \(session.receivedPacketCount) received, \(session.droppedPacketCount) dropped")
         .font(.callout)

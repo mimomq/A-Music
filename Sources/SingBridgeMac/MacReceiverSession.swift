@@ -25,10 +25,12 @@ final class MacReceiverSession: ObservableObject {
   @Published var appleMusicResults: [AppleMusicCatalogTrack] = []
   @Published var playingAppleMusicTrackID: AppleMusicCatalogTrack.ID?
   @Published var isSearchingAppleMusic = false
+  @Published var isRunningSelfTest = false
   @Published var errorMessage: String?
 
   private var packetLossCounter = PacketLossCounter()
   private var jitterBuffer = AudioJitterBuffer(targetDepth: 3, maximumDepth: 12)
+  private var selfTestTask: Task<Void, Never>?
   private let audioReceiver = NetworkAudioReceiver()
   private let audioPlayback = AudioPlaybackService()
   private let accompanimentPlayer = AccompanimentPlayerService()
@@ -105,6 +107,7 @@ final class MacReceiverSession: ObservableObject {
   func stopListening() {
     audioReceiver.stop()
     audioPlayback.stop()
+    stopSelfTest()
     connectionState = .idle
     levelMeter = .silent
     receivedPacketCount = 0
@@ -223,6 +226,52 @@ final class MacReceiverSession: ObservableObject {
         fail(error.localizedDescription)
       }
     }
+  }
+
+  func toggleSelfTest() {
+    isRunningSelfTest ? stopSelfTest() : startSelfTest()
+  }
+
+  private func startSelfTest() {
+    do {
+      errorMessage = nil
+      isRunningSelfTest = true
+      connectionState = .connected(deviceName: "Self Test", latencyMilliseconds: 0)
+      try audioPlayback.start(format: AudioStreamFormat(settings: settings))
+
+      selfTestTask?.cancel()
+      selfTestTask = Task { [weak self] in
+        let packets = TestToneGenerator.packets(
+          duration: 1.2,
+          packetDuration: 0.02,
+          sampleRate: self?.settings.sampleRate ?? 48_000,
+          frequency: 440,
+          startSequenceNumber: UInt64(self?.receivedPacketCount ?? 0),
+          startTimestampNanoseconds: DispatchTime.now().uptimeNanoseconds
+        )
+
+        for packet in packets {
+          if Task.isCancelled { return }
+          await MainActor.run {
+            self?.receive(packet: packet)
+          }
+          try? await Task.sleep(nanoseconds: 20_000_000)
+        }
+
+        await MainActor.run {
+          self?.isRunningSelfTest = false
+        }
+      }
+    } catch {
+      fail(error.localizedDescription)
+      isRunningSelfTest = false
+    }
+  }
+
+  private func stopSelfTest() {
+    selfTestTask?.cancel()
+    selfTestTask = nil
+    isRunningSelfTest = false
   }
 
   private func restoreSavedSession() {

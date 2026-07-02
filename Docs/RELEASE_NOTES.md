@@ -64,3 +64,11 @@
 - Added lyrics offset slider for manual sync correction.
 - Added tests for session snapshot coding and lyrics offset lookup.
 - Confirmed SwiftPM build and 21 core tests pass.
+
+## 0.8.0
+
+- Added shared test tone generator for audio-chain verification.
+- Added Mac receiver self-test that injects generated audio packets through the existing receive, jitter buffer, playback, diagnostics, and UI counter path.
+- Added MVP verification guide with Mac-only and iPhone-to-Mac checklists.
+- Added tests for test tone payload and packet generation.
+- Confirmed SwiftPM build and 23 core tests pass.
